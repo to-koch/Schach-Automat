@@ -1,5 +1,8 @@
-A chess ai with gui using the mimimax algoritm.
+A chess ai with gui using the minimax algoritm.
 
-Download: download the zip file containing a jar file and a resource folder in the download directory. 
-Execute by entering: java -jar ".\Schach-Automat"
+===DOWNLOAD===
+Download the zip file containing a jar file and a resource folder in the download directory. 
+
+===EXECUTE PROGRAMM===
+Enter prompt: java -jar .\Schach-Automat.jar
 Make sure that the jar file and resource folder are in the same directory.
