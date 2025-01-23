@@ -25,10 +25,10 @@ public abstract class MoveTools {
     /*
      * Returns all possible moves that can be executed by the figure specified by the coordinates
      */
-    public static ArrayList<Turn> get_possible_moves(BoardState state, int x, int y) {
+    public static ArrayList<Move> get_possible_moves(BoardState state, int x, int y) {
         int index = y * 8 + x;
         char code = state.board[index];
-        ArrayList<Turn> result = new ArrayList<>();
+        ArrayList<Move> result = new ArrayList<>();
 
         switch(code) {
             case 'B': // bishop
@@ -40,11 +40,11 @@ public abstract class MoveTools {
                     int delta = dest_x - x;
                     int dest_y = y + delta;
                     if (!(dest_y > 7 || dest_y < 0) && check_path_clear(state, x, y, dest_x, dest_y)) {
-                        result.add(new Turn(x, y, dest_x, dest_y));
+                        result.add(new Move(x, y, dest_x, dest_y));
                     }
                     dest_y = y - delta;
                     if (!(dest_y > 7 || dest_y < 0) && check_path_clear(state, x, y, dest_x, dest_y)) {
-                        result.add(new Turn(x, y, dest_x, dest_y));
+                        result.add(new Move(x, y, dest_x, dest_y));
                     }
                 }
                 return result;
@@ -59,7 +59,7 @@ public abstract class MoveTools {
                             continue;
                         }
                         if (check_path_clear(state, x, y, dest_x, dest_y)) {
-                            result.add(new Turn(x, y,  dest_x, dest_y));
+                            result.add(new Move(x, y,  dest_x, dest_y));
                         }
                     }
                 }
@@ -74,23 +74,23 @@ public abstract class MoveTools {
                     if (dest_x > 7 || dest_x < 0 || dest_y > 7 || dest_y < 0) {
                         continue;
                     }
-                    result.add(new Turn(x, y, dest_x, dest_y));
+                    result.add(new Move(x, y, dest_x, dest_y));
                 }
                 return result;
             case 'P': // pawn black
                 if (y < 7) {
-                    result.add(new Turn(x, y, x, y + 1));
+                    result.add(new Move(x, y, x, y + 1));
                 }
                 if (!state.has_been_moved.get(y * 8 + x)) {
-                    result.add(new Turn(x, y, x, y + 2));
+                    result.add(new Move(x, y, x, y + 2));
                 }
                 return result;
             case 'p': // pawn white
                 if (y > 0) {
-                    result.add(new Turn(x, y, x, y - 1));
+                    result.add(new Move(x, y, x, y - 1));
                 }
                 if (!state.has_been_moved.get(y * 8 + x)) {
-                    result.add(new Turn(x, y, x, y - 2));
+                    result.add(new Move(x, y, x, y - 2));
                 }
                 return result;
             case 'Q': // queen
@@ -102,11 +102,11 @@ public abstract class MoveTools {
                     int delta = dest_x - x;
                     int dest_y = y + delta;
                     if (!(dest_y > 7 || dest_y < 0) && check_path_clear(state, x, y, dest_x, dest_y)) {
-                        result.add(new Turn(x, y, dest_x, dest_y));
+                        result.add(new Move(x, y, dest_x, dest_y));
                     }
                     dest_y = y - delta;
                     if (!(dest_y > 7 || dest_y < 0) && check_path_clear(state, x, y, dest_x, dest_y)) {
-                        result.add(new Turn(x, y, dest_x, dest_y));
+                        result.add(new Move(x, y, dest_x, dest_y));
                     }
                 }
                 for (int dest_x = 0; dest_x < 7; dest_x++) {
@@ -114,7 +114,7 @@ public abstract class MoveTools {
                         continue;
                     }
                     if (check_path_clear(state, x, y, dest_x, y)) {
-                        result.add(new Turn(x, y, dest_x, y));
+                        result.add(new Move(x, y, dest_x, y));
                     }
                 }
                 for (int dest_y = 0; dest_y < 7; dest_y++) {
@@ -122,7 +122,7 @@ public abstract class MoveTools {
                         continue;
                     }
                     if (check_path_clear(state, x, y, x, dest_y)) {
-                        result.add(new Turn(x, y, x, dest_y));
+                        result.add(new Move(x, y, x, dest_y));
                     }
                 }
                 return result;
@@ -133,7 +133,7 @@ public abstract class MoveTools {
                         continue;
                     }
                     if (check_path_clear(state, x, y, dest_x, y)) {
-                        result.add(new Turn(x, y, dest_x, y));
+                        result.add(new Move(x, y, dest_x, y));
                     }
                 }
                 for (int dest_y = 0; dest_y < 7; dest_y++) {
@@ -141,7 +141,7 @@ public abstract class MoveTools {
                         continue;
                     }
                     if (check_path_clear(state, x, y, x, dest_y)) {
-                        result.add(new Turn(x, y, x, dest_y));
+                        result.add(new Move(x, y, x, dest_y));
                     }
                 }
                 return result;
@@ -196,6 +196,43 @@ public abstract class MoveTools {
                     return false;
                 }
             }
+        }
+        return true;
+    }
+
+    /*
+     * executes a given move
+     */
+    public static boolean execute_move(BoardState state, Move move, char color) {
+        if (color != 'w' && color != 'b') {
+            return false;
+        }
+
+        int dest_idx = move.dets_y * 8 + move.dest_x;
+        int src_idx = move.src_y * 8 + move.src_x;
+        char dest_fig = state.board[dest_idx];
+        char src_fig = state.board[src_idx];
+        char dest_color = 'w';
+        if (dest_fig >= 65 && dest_fig <= 90) {
+            dest_color = 'b';
+        }
+        if (color == dest_color) { // tile is occupied by figure of same color
+            return false;
+        }
+
+        // change array entries
+        state.has_been_moved.clear(src_idx);
+        state.has_been_moved.set(dest_idx);
+        state.board[src_fig] = 0;
+        state.board[dest_fig] = src_fig;
+        // adjust last moved entries
+        state.last_moved[0] = src_idx;
+        state.last_moved[1] = dest_idx;
+        // adjust king index if moved
+        if (src_fig == 'k') {
+            state.king_indicies[0] = dest_idx;
+        } else if (src_fig == 'K') {
+            state.king_indicies[1] = dest_idx;
         }
         return true;
     }

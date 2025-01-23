@@ -87,7 +87,7 @@ public class BoardDrawer extends JLabel {
                 if (code >= 97 && code <= 122) {
                     // draw white figure
                     color_idx = 0;
-                } else if (code >= 65 && code <= 90) {
+                    } else if (code >= 65 && code <= 90) {
                     // draw black figure
                     color_idx = 1;
                 } else {

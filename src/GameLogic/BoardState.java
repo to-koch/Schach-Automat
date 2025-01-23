@@ -24,6 +24,10 @@ public class BoardState {
      * Array of length 2 to store the indices of the 2 tiles involved in the last move
      */
     public int[] last_moved = new int[2];
+    /*
+     * Saves the position of the 2 kings (0 = white; b = black)
+     */
+    public int[] king_indicies = new int[2];
 
     /*
      * Initializes the board with the start values
@@ -31,6 +35,7 @@ public class BoardState {
     public void init() {
         has_been_moved.clear();
         last_moved[0] = -1; last_moved[1] = -1;
+        king_indicies[0] = 60; king_indicies[1] = 4;
 
         board[0] = 'R';
         board[1] = 'N';
@@ -65,6 +70,8 @@ public class BoardState {
         b.has_been_moved = (BitSet) this.has_been_moved.clone();
         b.last_moved[0] = this.last_moved[0];
         b.last_moved[1] = this.last_moved[1];
+        b.king_indicies[0] = this.king_indicies[0];
+        b.king_indicies[1] = this.king_indicies[1];
         return b;
     }
 }
