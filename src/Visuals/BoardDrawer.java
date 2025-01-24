@@ -122,4 +122,9 @@ public class BoardDrawer extends JLabel {
             toggle *= -1;
         }
     }
+
+    public void update_board(BoardState state) {
+        this.state = state;
+        repaint();
+    }
 }

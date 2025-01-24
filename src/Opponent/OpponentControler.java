@@ -4,6 +4,10 @@
 
 package Opponent;
 
+import GameLogic.BoardState;
+import GameLogic.Move;
+import GameLogic.MoveTools;
+
 public class OpponentControler {
 
     /*
@@ -22,5 +26,10 @@ public class OpponentControler {
         } else {
             this.color = 'w';
         }
+    }
+
+    public BoardState next_move(BoardState state) {
+        Move move = MoveFinder.get_best_move(state, color, rec_depth);
+        return MoveTools.execute_move(state, move, color);
     }
 }

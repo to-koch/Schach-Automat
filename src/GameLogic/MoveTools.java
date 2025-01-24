@@ -79,17 +79,33 @@ public abstract class MoveTools {
                 return result;
             case 'P': // pawn black
                 if (y < 7) {
-                    result.add(new Move(x, y, x, y + 1));
+                    if (state.board[(y + 1) * 8 + x] == 0) {
+                        result.add(new Move(x, y, x, y + 1));
+                    }
+                    if (x > 0 && state.board[(y + 1) * 8 + x - 1] != 0) {
+                        result.add(new Move(x, y, x - 1, y + 1));
+                    }
+                    if (x < 7 && state.board[(y + 1) * 8 + x + 1] != 0) {
+                        result.add(new Move(x, y, x + 1, y + 1));
+                    }
                 }
-                if (!state.has_been_moved.get(y * 8 + x)) {
+                if (!state.has_been_moved.get(y * 8 + x) && state.board[(y + 2) * 8 + x] == 0) {
                     result.add(new Move(x, y, x, y + 2));
                 }
                 return result;
             case 'p': // pawn white
                 if (y > 0) {
-                    result.add(new Move(x, y, x, y - 1));
+                    if (state.board[(y - 1) * 8 + x] == 0) {
+                        result.add(new Move(x, y, x, y - 1));
+                    }
+                    if (x > 0 && state.board[(y - 1) * 8 + x - 1] != 0) {
+                        result.add(new Move(x, y, x - 1, y - 1));
+                    }
+                    if (x < 7 && state.board[(y - 1) * 8 + x + 1] != 0) {
+                        result.add(new Move(x, y, x + 1, y - 1));
+                    }
                 }
-                if (!state.has_been_moved.get(y * 8 + x)) {
+                if (!state.has_been_moved.get(y * 8 + x) && state.board[(y - 2) * 8 + x] == 0) {
                     result.add(new Move(x, y, x, y - 2));
                 }
                 return result;
@@ -158,24 +174,25 @@ public abstract class MoveTools {
         boolean vertical_move = dest_x == src_x;
 
         if (diagonal_move) {
-            int delta_x = 1;
-            int delta_y = 1;
-            int start_x = src_x;
-            int end_x = dest_x;
-            int y = src_y + 1;
-            if (start_x < end_x) {
-                delta_x = -1;
-                start_x = dest_x;
-                end_x = src_x;
-            }
-            if (src_y < dest_y) {
-                delta_y = -1;
-                y = dest_y + 1;
-            }
-            for (int x = start_x + 1; x < end_x; x += delta_x, y += delta_y) {
-                int i = y * 8 + x;
-                if ((int) state.board[i] != 0) {
-                    return false;
+            if (src_x < dest_x) {
+                int delta_y = (int) Math.signum(dest_y - src_y);
+                int y = src_y + delta_y;
+                for (int x = src_x + 1; x < dest_x; x++, y += delta_y) {
+                    // Calculate index in board array
+                    int i = y * 8 + x;
+                    if ((int) state.board[i] != 0) {
+                        return false;
+                    }
+                }
+            } else {
+                int delta_y = (int) Math.signum(dest_y - src_y);
+                int y = src_y + delta_y;
+                for (int x = src_x - 1; x > dest_x; x--, y += delta_y) {
+                    // Calculate index in board array
+                    int i = y * 8 + x;
+                    if ((int) state.board[i] != 0) {
+                        return false;
+                    }
                 }
             }
         } else if (horizontal_move) {
@@ -201,40 +218,38 @@ public abstract class MoveTools {
     }
 
     /*
-     * executes a given move
+     * copies board and returns a new board with the given move executed
      */
-    public static boolean execute_move(BoardState state, Move move, char color) {
-        if (color != 'w' && color != 'b') {
-            return false;
+    public static BoardState execute_move(BoardState state, Move move, char color) {
+        if ((color != 'w' && color != 'b') || move == null) {
+            return null;
         }
 
-        int dest_idx = move.dets_y * 8 + move.dest_x;
+        int dest_idx = move.dest_y * 8 + move.dest_x;
         int src_idx = move.src_y * 8 + move.src_x;
         char dest_fig = state.board[dest_idx];
         char src_fig = state.board[src_idx];
-        char dest_color = 'w';
-        if (dest_fig >= 65 && dest_fig <= 90) {
-            dest_color = 'b';
-        }
-        if (color == dest_color) { // tile is occupied by figure of same color
-            return false;
+        if ((color == 'b' && Character.isUpperCase(dest_fig)) || (color == 'w' && Character.isLowerCase(dest_fig))) { // tile is occupied by figure of same color
+            return null;
         }
 
+        BoardState state_c = state.copy();
+
         // change array entries
-        state.has_been_moved.clear(src_idx);
-        state.has_been_moved.set(dest_idx);
-        state.board[src_fig] = 0;
-        state.board[dest_fig] = src_fig;
+        state_c.has_been_moved.clear(src_idx);
+        state_c.has_been_moved.set(dest_idx);
+        state_c.board[src_idx] = 0;
+        state_c.board[dest_idx] = src_fig;
         // adjust last moved entries
-        state.last_moved[0] = src_idx;
-        state.last_moved[1] = dest_idx;
+        state_c.last_moved[0] = src_idx;
+        state_c.last_moved[1] = dest_idx;
         // adjust king index if moved
         if (src_fig == 'k') {
-            state.king_indicies[0] = dest_idx;
+            state_c.king_indicies[0] = dest_idx;
         } else if (src_fig == 'K') {
-            state.king_indicies[1] = dest_idx;
+            state_c.king_indicies[1] = dest_idx;
         }
-        return true;
+        return state_c;
     }
 
     /*
@@ -254,12 +269,75 @@ public abstract class MoveTools {
         for (int i = 0; i < state.board.length; i++) {
             char code = state.board[i];
             if (code >= 97 && code <= 122) {
-                result += (prefix * Piece.get_value(code) * heat_map[i]);
+                result += (prefix * Piece.get_value(code)/* + heat_map[i]*/);
             } else if (code >= 65 && code <= 90) {
-                result -= (prefix * Piece.get_value(code) * heat_map[i]);
+                result -= (prefix * Piece.get_value(code)/* + heat_map[i]*/);
             }
         }
         return result;
     }
 
+    /*
+     * checks if the king of the given color is in check
+     */
+    public static boolean check_chess(BoardState state, char color) {
+        int king_idx = state.king_indicies[0];
+        if (color == 'b') {
+            king_idx = state.king_indicies[1];
+        }
+        int king_x = king_idx % 8;
+        int king_y = king_idx / 8;
+
+        // iterate over board and check if king is threatened
+        for (int i = 0; i < 64; i++) {
+            int x = i % 8;
+            int y = i / 8;
+            if (x == king_x && y == king_y) {
+                continue;
+            }
+            int fig = state.board[i];
+            if (fig == 0) { // tile is empty
+                continue;
+            }
+            char dest_color = 'w';
+            if (fig >= 65 && fig <= 90) {
+                dest_color = 'b';
+            }
+            if (color == dest_color) { // tile is occupied by figure of same color
+                continue;
+            }
+            if (check_path_clear(state, x, y, king_x, king_y)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /*
+     * checks if the given color is in check mate
+     */
+    public static boolean check_chess_mate(BoardState state, char color) {
+        if (!check_chess(state, color)) {
+            return false;
+        }
+
+        int king_idx = state.king_indicies[0];
+        if (color == 'b') {
+            king_idx = state.king_indicies[1];
+        }
+        int king_x = king_idx % 8;
+        int king_y = king_idx / 8;
+
+        // iterate over board and kings moves and check if king still is threatend
+        ArrayList<Move> king_moves = get_possible_moves(state, king_x, king_y);
+        for (Move move :king_moves) {
+            BoardState state_c = execute_move(state, move, color);
+            if (state_c != null) {
+                if (!check_chess(state_c, color)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
