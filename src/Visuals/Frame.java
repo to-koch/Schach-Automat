@@ -4,7 +4,7 @@
 
 package Visuals;
 
-import GameLogic.BoardState;
+import GameLogic.BoardConfig;
 import Main.Const;
 
 import javax.swing.*;
@@ -12,16 +12,16 @@ import java.awt.*;
 
 public class Frame extends JFrame {
 
-    /*
+    /**
      * Label to indicate which player (black or white) is to execute a turn
      */
     private final JLabel turn_label;
-    /*
-     * Label to draw current board state
+    /**
+     * Label to draw current board configuration
      */
     private BoardDrawer drawer;
 
-    public Frame(BoardState initial_state) {
+    public Frame(BoardConfig initial_board) {
         super();
 
         // calculate frame size to be 90% of the screen height
@@ -55,7 +55,7 @@ public class Frame extends JFrame {
         turn_label.setLocation(0, 0);
         turn_label.setVisible(true);
         layout.add(turn_label, JLayeredPane.PALETTE_LAYER);
-        drawer = new BoardDrawer(initial_state, board_size);
+        drawer = new BoardDrawer(initial_board, board_size);
         drawer.setLocation(0, board_offset);
         layout.add(drawer);
 

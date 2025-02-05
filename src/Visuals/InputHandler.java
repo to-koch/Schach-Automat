@@ -10,15 +10,15 @@ import java.awt.event.MouseListener;
 
 public class InputHandler implements MouseListener {
 
-    /*
+    /**
      * the board drawers size
      */
     private final Dimension board_size;
-    /*
+    /**
      * the offset of the board relative to the board drawer label
      */
     private final int offset;
-    /*
+    /**
      * the size of a single tile
      */
     private final int square_size;
@@ -29,7 +29,7 @@ public class InputHandler implements MouseListener {
         this.square_size = square_size;
     }
 
-    /*
+    /**
      * evaluate which tile has been clicked
      */
     @Override

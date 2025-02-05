@@ -13,13 +13,13 @@ import java.io.IOException;
 
 public class Sprites {
 
-    /*
+    /**
      * 2d array to store the black and white sprite of every figure
      */
     public final static BufferedImage[][] sprites = new BufferedImage[2][6];
 
-    /*
-     * Loads the sprites
+    /**
+     * loads sprite files from resource folder
      */
     public static void load() {
         try {
