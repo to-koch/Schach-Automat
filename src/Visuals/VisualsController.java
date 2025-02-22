@@ -4,6 +4,8 @@
 
 package Visuals;
 
+import GameLogic.BoardConfig;
+
 public abstract class VisualsController {
 
     /**
@@ -16,10 +18,18 @@ public abstract class VisualsController {
     public static BoardDrawer drawer;
 
     /**
-     * sends a signal to the board_drawer to update
+     * sends a signal to the board drawer to update
      */
     public static void update_board() {
         drawer.repaint();
+    }
+
+    /**
+     * sends a signal to the board drawer to update using the new board configuration
+     * @param config the new board configuration to use
+     */
+    public static void update_board(BoardConfig config) {
+        drawer.update_board(config);
     }
 
     /**

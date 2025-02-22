@@ -1,5 +1,5 @@
 /**
- * Methods to get possible moves for a figure
+ * Methods to for finding and executing moves
  */
 
 package GameLogic;
@@ -108,7 +108,7 @@ public abstract class MoveTools {
                 }
             }
         } else if (fig_type == Figure.Type.KNIGHT) {
-            int[] x_new = {x-1, x+1, x-1, x+1, x-2, x-2, x+2, x-2};
+            int[] x_new = {x-1, x+1, x-1, x+1, x-2, x-2, x+2, x+2};
             int[] y_new = {y-2, y-2, y+2, y+2, y-1, y+1, y-1, y+1};
             for (int i = 0; i < 8; i++) {
                 if (x_new[i] > 7 || x_new[i] < 0 || y_new[i] > 7 || y_new[i] < 0) {
@@ -121,7 +121,7 @@ public abstract class MoveTools {
             }
         } else if (fig_type == Figure.Type.PAWN) {
             int delta_y = (fig_color == Figure.Color.WHITE) ? -1 : 1;
-            int upper = already_moved ? 3 : 2;
+            int upper = already_moved ? 2 : 3;
             for (int i = 1; i < upper; i++) {
                 int y_new = y + i * delta_y;
                 if (y_new > 7 || y_new < 0 || board.board[y_new * 8 + x] != 0) {
@@ -328,5 +328,30 @@ public abstract class MoveTools {
             }
         }
         return moves;
+    }
+
+    /**
+     * executes a given move, assuming that the move is legal
+     * @param board the board configuration on which to execute the move
+     * @param move the move to be executed
+     * @return a new board configuration
+     */
+    public static BoardConfig exec_move(BoardConfig board, Move move) {
+        BoardConfig b = board.copy();
+        int src_index = move.y_src * 8 + move.x_src;
+        int dest_index = move.y_dest * 8 + move.x_dest;
+        char fig = board.board[src_index];
+        if (!Figure.get_already_moved(fig)) {
+            fig += 1;
+        }
+        // adjust new board and if needed king indices
+        b.board[src_index] = 0;
+        b.board[dest_index] = fig;
+        if (Figure.get_type(fig) == Figure.Type.KING) {
+            b.king_indices[Figure.get_color(fig).ordinal()] = dest_index;
+        }
+        b.last_moved[0] = src_index;
+        b.last_moved[1] = dest_index;
+        return b;
     }
 }

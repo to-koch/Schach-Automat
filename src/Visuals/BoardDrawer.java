@@ -29,6 +29,10 @@ public class BoardDrawer extends JLabel {
      * the size of a single tile
      */
     private final int square_size;
+    /**
+     * information for every tile whether is highlighted
+     */
+    public boolean[] highlighted = new boolean[64];
 
     public BoardDrawer(BoardConfig board_config, Dimension size) {
         super();
@@ -58,7 +62,11 @@ public class BoardDrawer extends JLabel {
             for (int x = 0; x < 8; x++) {
                 // Calculate tile position in board array
                 int index_in_array = y * 8 + x;
-                if (board_config.last_moved[0] == index_in_array || board_config.last_moved[1] == index_in_array) {
+                if (highlighted[index_in_array]) {
+                    // highlight tiles
+                    g.setColor(new Color(110, 193, 248));
+                }
+                else if (board_config.last_moved[0] == index_in_array || board_config.last_moved[1] == index_in_array) {
                     // highlight tiles involved in last move
                     g.setColor(new Color(255, 127, 127));
                 }
@@ -97,6 +105,7 @@ public class BoardDrawer extends JLabel {
 
     public void update_board(BoardConfig board_config) {
         this.board_config = board_config;
+        this.highlighted = new boolean[64];
         repaint();
     }
 

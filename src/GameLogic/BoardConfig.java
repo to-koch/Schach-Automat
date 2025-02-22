@@ -13,9 +13,13 @@ public class BoardConfig {
      *  - HAS MOVED: ??0 has not been moved, ??1 has already been moved
      */
     public char[] board = new char[64];
-
+    /**
+     * indices of the tiles involved in the last move (for highlighting)
+     */
     public int[] last_moved = new int[2];
-
+    /**
+     * indices of the white (king_indices[0]) and black (king_indices[1]) king (for finding chess)
+     */
     public int[] king_indices = new int[2];
 
     /**
@@ -52,4 +56,15 @@ public class BoardConfig {
         king_indices[1] = 4;
     }
 
+    /**
+     * creates a copy of the board configuration
+     * @return deep copy of the board configuration
+     */
+    public BoardConfig copy() {
+        BoardConfig b = new BoardConfig();
+        System.arraycopy(this.board, 0, b.board, 0, 64);
+        System.arraycopy(this.last_moved, 0, b.last_moved, 0, 2);
+        System.arraycopy(this.king_indices, 0, b.king_indices, 0, 2);
+        return b;
+    }
 }
