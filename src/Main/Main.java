@@ -4,10 +4,7 @@
 
 package Main;
 
-import GameLogic.BoardConfig;
-import GameLogic.Figure;
-import GameLogic.Move;
-import GameLogic.MoveTools;
+import GameLogic.*;
 import Visuals.Frame;
 import Visuals.Sprites;
 import Visuals.VisualsController;
@@ -53,6 +50,14 @@ public class Main {
             }
             board = MoveTools.exec_move(board, move);
             VisualsController.update_board(board);
+            if (EvalTools.is_checked(board, Figure.Color.WHITE)) {
+                System.out.println("Weiß im Schach");
+            }
+            if (EvalTools.is_checked(board, Figure.Color.BLACK)) {
+                System.out.println("Schwarz im Schach");
+            }
+            System.out.println("Punkte: " + EvalTools.eval_board(board));
+            System.out.println("==================================");
         }
     }
 

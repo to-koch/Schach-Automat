@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class Sprites {
+public abstract class Sprites {
 
     /**
      * 2d array to store the black and white sprite of every figure
