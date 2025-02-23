@@ -67,4 +67,17 @@ public class BoardConfig {
         System.arraycopy(this.king_indices, 0, b.king_indices, 0, 2);
         return b;
     }
+
+    /**
+     * calculates an individual id for each board configuration, for lookup table
+     * @return the id
+     */
+    public int id() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 64; i++) {
+            sb.append(this.board[i]);
+        }
+        String s = sb.toString();
+        return s.hashCode();
+    }
 }

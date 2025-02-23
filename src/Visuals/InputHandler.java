@@ -4,9 +4,12 @@
 
 package Visuals;
 
+import Main.Const;
+
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.concurrent.BrokenBarrierException;
 
 public class InputHandler implements MouseListener {
 
@@ -44,7 +47,11 @@ public class InputHandler implements MouseListener {
         int tile_x = x / square_size;
         int tile_y = y / square_size;
         VisualsController.selected_tile = tile_y * 8 + tile_x;
-        VisualsController.update_board();
+        try {
+            Const.BARRIER.await();
+        } catch (InterruptedException | BrokenBarrierException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override

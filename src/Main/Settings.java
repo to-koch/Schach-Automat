@@ -19,5 +19,5 @@ public abstract class Settings {
     /**
      * the depth of the recursion tree to be traversed
      */
-    public static int REC_DEPTH = 4;
+    public static int REC_DEPTH = 6;
 }
