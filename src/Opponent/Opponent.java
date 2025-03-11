@@ -12,10 +12,12 @@ import java.util.HashMap;
 
 public abstract class Opponent {
 
+    private static int calls, hits;
     /**
-     * memoization table that stores already found board configuration ids with their corresponding evaluation
+     * memoization tables that stores already found board configuration ids with their corresponding evaluation
      */
-    private static HashMap<Integer, Integer> table;
+    private static final HashMap<Integer, Integer> table_max = new HashMap<>();
+    private static final HashMap<Integer, Integer> table_min = new HashMap<>();
 
     /**
      * evaluates the best next move from the computer's perspective
@@ -23,7 +25,9 @@ public abstract class Opponent {
      * @return the best move
      */
     public static Move get_next(BoardConfig board) {
-        table = new HashMap<>();
+        table_max.clear();
+        table_min.clear();
+        calls = 0; hits = 0;
 
         int max = Integer.MIN_VALUE;
         Move max_move = null;
@@ -31,29 +35,35 @@ public abstract class Opponent {
         Figure.Color next_color = (color == Figure.Color.WHITE) ? Figure.Color.BLACK : Figure.Color.WHITE;
         int rec_depth = Settings.REC_DEPTH - 1;
 
-        for (int x = 0; x < 64; x++) {
-            for (int y = 0; y < 64; y++) {
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
                 ArrayList<Move> moves = MoveTools.get_moves(board, x, y, color);
                 if (moves == null) {
                     continue;
                 }
                 for (Move m : moves) {
                     BoardConfig board_new = MoveTools.exec_move(board, m);
+                    if (EvalTools.is_checked(board_new, color)) {
+                        continue;
+                    }
                     int val;
-                    int id = board_new.id();
-                    if (table.containsKey(id)) {
-                        val = table.get(id);
+                    int id = board_new.id(); calls++;
+                    if (/*table_max.containsKey(id)*/false) {
+                        val = table_max.get(id); hits++;
                     } else {
                         val = mini(board_new, rec_depth, next_color);
+                        table_max.put(id, val);
                     }
                     if (val > max) {
                         max = val;
                         max_move = m;
                     }
-                    table.put(board_new.id(), val);
                 }
             }
         }
+        table_max.clear();
+        table_min.clear();
+        System.out.println("Value:" + max + " | Calls:" + calls + ", Hits:" + hits + ", Ration:" + ((double)hits/calls));
         return max_move;
     }
 
@@ -72,25 +82,28 @@ public abstract class Opponent {
         Figure.Color next_color = (color == Figure.Color.WHITE) ? Figure.Color.BLACK : Figure.Color.WHITE;
         int r = rec_depth - 1;
 
-        for (int x = 0; x < 64; x++) {
-            for (int y = 0; y < 64; y++) {
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
                 ArrayList<Move> moves = MoveTools.get_moves(board, x, y, color);
                 if (moves == null) {
                     continue;
                 }
                 for (Move m : moves) {
                     BoardConfig board_new = MoveTools.exec_move(board, m);
+                    if (EvalTools.is_checked(board_new, color)) {
+                        continue;
+                    }
                     int val;
-                    int id = board_new.id();
-                    if (table.containsKey(id)) {
-                        val = table.get(id);
+                    int id = board_new.id(); calls++;
+                    if (/*table_max.containsKey(id)*/false) {
+                        val = table_max.get(id); hits++;
                     } else {
                         val = mini(board_new, r, next_color);
+                        table_max.put(id, val);
                     }
                     if (val > max) {
                         max = val;
                     }
-                    table.put(board_new.id(), val);
                 }
             }
         }
@@ -112,25 +125,28 @@ public abstract class Opponent {
         Figure.Color next_color = (color == Figure.Color.WHITE) ? Figure.Color.BLACK : Figure.Color.WHITE;
         int r = rec_depth - 1;
 
-        for (int x = 0; x < 64; x++) {
-            for (int y = 0; y < 64; y++) {
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
                 ArrayList<Move> moves = MoveTools.get_moves(board, x, y, color);
                 if (moves == null) {
                     continue;
                 }
                 for (Move m : moves) {
                     BoardConfig board_new = MoveTools.exec_move(board, m);
+                    if (EvalTools.is_checked(board_new, color)) {
+                        continue;
+                    }
                     int val;
-                    int id = board_new.id();
-                    if (table.containsKey(id)) {
-                        val = table.get(id);
+                    int id = board_new.id(); calls++;
+                    if (/*table_min.containsKey(id)*/false) {
+                        val = table_min.get(id); hits++;
                     } else {
                         val = maxi(board_new, r, next_color);
+                        table_min.put(id, val);
                     }
                     if (val < min) {
                         min = val;
                     }
-                    table.put(board_new.id(), val);
                 }
             }
         }

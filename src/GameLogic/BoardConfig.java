@@ -76,6 +76,8 @@ public class BoardConfig {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 64; i++) {
             sb.append(this.board[i]);
+            sb.append(this.board[i]);
+            sb.append(this.board[i]);
         }
         String s = sb.toString();
         return s.hashCode();

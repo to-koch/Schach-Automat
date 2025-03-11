@@ -6,6 +6,7 @@ package Main;
 
 import GameLogic.*;
 import Opponent.Opponent;
+import Visuals.ErrorMsg;
 import Visuals.Frame;
 import Visuals.Sprites;
 import Visuals.VisualsController;
@@ -42,6 +43,7 @@ public class Main {
                 VisualsController.selected_tile = -1;
                 board = MoveTools.exec_move(board, player_move);
                 VisualsController.update_board(board);
+                System.out.println(EvalTools.eval_board(board));//========
                 // black computer move
                 Move cmp_move = Opponent.get_next(board);
                 if (cmp_move == null) {
@@ -49,6 +51,7 @@ public class Main {
                 }
                 board = MoveTools.exec_move(board, cmp_move);
                 VisualsController.update_board(board);
+                System.out.println(EvalTools.eval_board(board));//========
             } else {
                 // white computer move
                 Move cmp_move = Opponent.get_next(board);
@@ -57,6 +60,7 @@ public class Main {
                 }
                 board = MoveTools.exec_move(board, cmp_move);
                 VisualsController.update_board(board);
+                System.out.println(EvalTools.eval_board(board));//========
                 // black player move
                 Move player_move = await_player_move(board);
                 while (player_move == null) {
@@ -67,12 +71,13 @@ public class Main {
                 VisualsController.selected_tile = -1;
                 board = MoveTools.exec_move(board, player_move);
                 VisualsController.update_board(board);
+                System.out.println(EvalTools.eval_board(board));//========
             }
         }
     }
 
     /**
-     * reads the next player's move, synchronized with input handel via barrier
+     * reads the next player's move, synchronized with input handel via barrier, and shows an error message if an illegal move was entered
      * @param board the current board configuration
      * @return the player's move or @null in case of illegal input
      */
@@ -82,30 +87,40 @@ public class Main {
         } catch (InterruptedException | BrokenBarrierException e) {
             throw new RuntimeException(e);
         }
+
         int i = VisualsController.selected_tile;
         int x_src = i % 8;
         int y_src = i / 8;
         ArrayList<Move> moves = MoveTools.get_moves(board, x_src, y_src, Settings.PLAYER_COLOR);
         if (moves == null) {
+            ErrorMsg.show("Please select a " + Settings.PLAYER_COLOR.toString().toLowerCase() + " figure");
             return null;
         }
         for (Move m : moves) {
             VisualsController.drawer.highlighted[m.y_dest * 8 + m.x_dest] = true;
         }
         VisualsController.update_board();
+
         try {
             Const.BARRIER.await();
         } catch (InterruptedException | BrokenBarrierException e) {
             throw new RuntimeException(e);
         }
+
         i = VisualsController.selected_tile;
         int x_dest = i % 8;
         int y_dest = i / 8;
         for (Move m : moves) {
             if (m.x_dest == x_dest && m.y_dest == y_dest) {
-                return new Move(x_src, y_src, x_dest, y_dest);
+                Move move = new Move(x_src, y_src, x_dest, y_dest);
+                if (EvalTools.is_checked(MoveTools.exec_move(board, move), Settings.PLAYER_COLOR)) {
+                    ErrorMsg.show("Your king must not be in check");
+                    return null;
+                }
+                return move;
             }
         }
+        ErrorMsg.show("Please select a valid move");
         return null;
     }
 }
