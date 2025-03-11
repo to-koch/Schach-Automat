@@ -6,6 +6,7 @@ package GameLogic;
 
 import Main.Settings;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public abstract class EvalTools {
@@ -34,7 +35,7 @@ public abstract class EvalTools {
 
     /**
      * checks if the king of the specified color is in check
-     * @param board the board
+     * @param board the current board
      * @param color the color of the king to be checked
      * @return true if the king is in check else false
      */
@@ -55,5 +56,29 @@ public abstract class EvalTools {
             }
         }
         return false;
+    }
+
+    /**
+     * checks if a color is in checkmate
+     * @param board the current board
+     * @param color the color to be checked
+     * @return true if the color is in checkmate else false
+     */
+    public static boolean checkmate(BoardConfig board, Figure.Color color) {
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                ArrayList<Move> moves = MoveTools.get_moves(board, x, y, color);
+                if (moves == null) {
+                    continue;
+                }
+                for (Move m : moves) {
+                    BoardConfig board_new = MoveTools.exec_move(board, m);
+                    if (!is_checked(board_new, color)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 }

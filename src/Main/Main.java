@@ -6,10 +6,7 @@ package Main;
 
 import GameLogic.*;
 import Opponent.Opponent;
-import Visuals.ErrorMsg;
-import Visuals.Frame;
-import Visuals.Sprites;
-import Visuals.VisualsController;
+import Visuals.*;
 
 import java.util.ArrayList;
 import java.util.concurrent.BrokenBarrierException;
@@ -30,8 +27,7 @@ public class Main {
      * @param board the initial board configuration
      */
     private static void game_loop(BoardConfig board) {
-        boolean finished = false;
-        while (!finished) {
+        while (true) {
             if (Figure.Color.WHITE == Settings.PLAYER_COLOR) {
                 // white player move
                 Move player_move = await_player_move(board);
@@ -43,24 +39,35 @@ public class Main {
                 VisualsController.selected_tile = -1;
                 board = MoveTools.exec_move(board, player_move);
                 VisualsController.update_board(board);
-                System.out.println(EvalTools.eval_board(board));//========
+                if (EvalTools.checkmate(board, Figure.Color.BLACK)) {
+                    WinnerMsg.show(Figure.Color.WHITE);
+                    System.exit(0);
+                }
                 // black computer move
                 Move cmp_move = Opponent.get_next(board);
                 if (cmp_move == null) {
-
+                    WinnerMsg.show(Figure.Color.WHITE);
+                    System.exit(0);
                 }
                 board = MoveTools.exec_move(board, cmp_move);
                 VisualsController.update_board(board);
-                System.out.println(EvalTools.eval_board(board));//========
+                if (EvalTools.checkmate(board, Figure.Color.WHITE)) {
+                    WinnerMsg.show(Figure.Color.BLACK);
+                    System.exit(0);
+                }
             } else {
                 // white computer move
                 Move cmp_move = Opponent.get_next(board);
                 if (cmp_move == null) {
-
+                    WinnerMsg.show(Figure.Color.BLACK);
+                    System.exit(0);
                 }
                 board = MoveTools.exec_move(board, cmp_move);
                 VisualsController.update_board(board);
-                System.out.println(EvalTools.eval_board(board));//========
+                if (EvalTools.checkmate(board, Figure.Color.BLACK)) {
+                    WinnerMsg.show(Figure.Color.WHITE);
+                    System.exit(0);
+                }
                 // black player move
                 Move player_move = await_player_move(board);
                 while (player_move == null) {
@@ -71,7 +78,10 @@ public class Main {
                 VisualsController.selected_tile = -1;
                 board = MoveTools.exec_move(board, player_move);
                 VisualsController.update_board(board);
-                System.out.println(EvalTools.eval_board(board));//========
+                if (EvalTools.checkmate(board, Figure.Color.WHITE)) {
+                    WinnerMsg.show(Figure.Color.BLACK);
+                    System.exit(0);
+                }
             }
         }
     }
