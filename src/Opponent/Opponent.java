@@ -6,7 +6,6 @@ package Opponent;
 
 import GameLogic.*;
 import Main.Settings;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,6 +17,10 @@ public abstract class Opponent {
      */
     private static final HashMap<Integer, Integer> table_max = new HashMap<>();
     private static final HashMap<Integer, Integer> table_min = new HashMap<>();
+    /**
+     * counter to track how many turns have been played by the computer
+     */
+    private static int turn_count = 3;
 
     /**
      * evaluates the best next move from the computer's perspective
@@ -25,6 +28,11 @@ public abstract class Opponent {
      * @return the best move
      */
     public static Move get_next(BoardConfig board) {
+        if (turn_count < 3) {
+            turn_count++;
+            return Openings.get_next();
+        }
+
         table_max.clear();
         table_min.clear();
         calls = 0; hits = 0;
@@ -46,9 +54,12 @@ public abstract class Opponent {
                     if (EvalTools.is_checked(board_new, color)) {
                         continue;
                     }
+                    if (EvalTools.checkmate(board_new, next_color) == EvalTools.Checkmate.TRUE) {
+                        return m;
+                    }
                     int val;
                     int id = board_new.id(); calls++;
-                    if (/*table_max.containsKey(id)*/false) {
+                    if (table_max.containsKey(id)) {
                         val = table_max.get(id); hits++;
                     } else {
                         val = mini(board_new, rec_depth, next_color);
@@ -63,7 +74,6 @@ public abstract class Opponent {
         }
         table_max.clear();
         table_min.clear();
-        System.out.println("Value:" + max + " | Calls:" + calls + ", Hits:" + hits + ", Ration:" + ((double)hits/calls));
         return max_move;
     }
 
@@ -90,12 +100,12 @@ public abstract class Opponent {
                 }
                 for (Move m : moves) {
                     BoardConfig board_new = MoveTools.exec_move(board, m);
-                    if (EvalTools.is_checked(board_new, color)) {
-                        continue;
+                    if (EvalTools.checkmate(board_new, next_color) == EvalTools.Checkmate.TRUE) {
+                        return Integer.MAX_VALUE;
                     }
                     int val;
                     int id = board_new.id(); calls++;
-                    if (/*table_max.containsKey(id)*/false) {
+                    if (table_max.containsKey(id)) {
                         val = table_max.get(id); hits++;
                     } else {
                         val = mini(board_new, r, next_color);
@@ -133,12 +143,12 @@ public abstract class Opponent {
                 }
                 for (Move m : moves) {
                     BoardConfig board_new = MoveTools.exec_move(board, m);
-                    if (EvalTools.is_checked(board_new, color)) {
-                        continue;
+                    if (EvalTools.checkmate(board_new, next_color) == EvalTools.Checkmate.TRUE) {
+                        return Integer.MIN_VALUE;
                     }
                     int val;
                     int id = board_new.id(); calls++;
-                    if (/*table_min.containsKey(id)*/false) {
+                    if (table_min.containsKey(id)) {
                         val = table_min.get(id); hits++;
                     } else {
                         val = maxi(board_new, r, next_color);

@@ -21,4 +21,8 @@ public abstract class WinnerMsg {
             JOptionPane.showMessageDialog(null, msg, "You have lost!", JOptionPane.INFORMATION_MESSAGE);
         }
     }
+
+    public static void show_draw() {
+        JOptionPane.showMessageDialog(null, "Game ended in a draw", "Draw!", JOptionPane.INFORMATION_MESSAGE);
+    }
 }

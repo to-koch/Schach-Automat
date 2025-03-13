@@ -7,7 +7,6 @@ package Main;
 import GameLogic.*;
 import Opponent.Opponent;
 import Visuals.*;
-
 import java.util.ArrayList;
 import java.util.concurrent.BrokenBarrierException;
 
@@ -27,6 +26,7 @@ public class Main {
      * @param board the initial board configuration
      */
     private static void game_loop(BoardConfig board) {
+        EvalTools.Checkmate checkmate;
         while (true) {
             if (Figure.Color.WHITE == Settings.PLAYER_COLOR) {
                 // white player move
@@ -39,8 +39,13 @@ public class Main {
                 VisualsController.selected_tile = -1;
                 board = MoveTools.exec_move(board, player_move);
                 VisualsController.update_board(board);
-                if (EvalTools.checkmate(board, Figure.Color.BLACK)) {
+                checkmate = EvalTools.checkmate(board, Figure.Color.BLACK);
+                if (checkmate == EvalTools.Checkmate.TRUE) {
                     WinnerMsg.show(Figure.Color.WHITE);
+                    System.exit(0);
+                }
+                if (checkmate == EvalTools.Checkmate.DRAW) {
+                    WinnerMsg.show_draw();
                     System.exit(0);
                 }
                 // black computer move
@@ -51,8 +56,13 @@ public class Main {
                 }
                 board = MoveTools.exec_move(board, cmp_move);
                 VisualsController.update_board(board);
-                if (EvalTools.checkmate(board, Figure.Color.WHITE)) {
+                checkmate = EvalTools.checkmate(board, Figure.Color.WHITE);
+                if (checkmate == EvalTools.Checkmate.TRUE) {
                     WinnerMsg.show(Figure.Color.BLACK);
+                    System.exit(0);
+                }
+                if (checkmate == EvalTools.Checkmate.DRAW) {
+                    WinnerMsg.show_draw();
                     System.exit(0);
                 }
             } else {
@@ -64,8 +74,13 @@ public class Main {
                 }
                 board = MoveTools.exec_move(board, cmp_move);
                 VisualsController.update_board(board);
-                if (EvalTools.checkmate(board, Figure.Color.BLACK)) {
+                checkmate = EvalTools.checkmate(board, Figure.Color.BLACK);
+                if (checkmate == EvalTools.Checkmate.TRUE) {
                     WinnerMsg.show(Figure.Color.WHITE);
+                    System.exit(0);
+                }
+                if (checkmate == EvalTools.Checkmate.DRAW) {
+                    WinnerMsg.show_draw();
                     System.exit(0);
                 }
                 // black player move
@@ -78,8 +93,13 @@ public class Main {
                 VisualsController.selected_tile = -1;
                 board = MoveTools.exec_move(board, player_move);
                 VisualsController.update_board(board);
-                if (EvalTools.checkmate(board, Figure.Color.WHITE)) {
+                checkmate = EvalTools.checkmate(board, Figure.Color.WHITE);
+                if (checkmate == EvalTools.Checkmate.TRUE) {
                     WinnerMsg.show(Figure.Color.BLACK);
+                    System.exit(0);
+                }
+                if (checkmate == EvalTools.Checkmate.DRAW) {
+                    WinnerMsg.show_draw();
                     System.exit(0);
                 }
             }

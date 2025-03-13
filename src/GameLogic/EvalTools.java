@@ -5,16 +5,18 @@
 package GameLogic;
 
 import Main.Settings;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public abstract class EvalTools {
 
     /**
+     * all possible checkmate states
+     */
+    public enum Checkmate {TRUE, FALSE, DRAW}
+    /**
      * basic value of each figure {bishop, king, knight, pawn, queen, rook}
      */
-    private static final int[] fig_values = {3, 100, 3, 1, 9, 5};
+    private static final int[] fig_values = {3, 1000, 3, 1, 9, 5};
 
     /**
      * evaluates the board
@@ -31,6 +33,23 @@ public abstract class EvalTools {
             }
         }
         return count;
+    }
+
+    /**
+     * checks if the given color still owns its king
+     * @param board the current boatd state
+     * @param color the color to check
+     * @return true if the given color still owns its king else false
+     */
+    public static boolean has_king(BoardConfig board, Figure.Color color) {
+        for (int i = 0; i < 64; i++) {
+            char code = board.board[i];
+            if (code == 0 || Figure.get_color(code) != color || Figure.get_type(code) != Figure.Type.KING) {
+                continue;
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -64,21 +83,26 @@ public abstract class EvalTools {
      * @param color the color to be checked
      * @return true if the color is in checkmate else false
      */
-    public static boolean checkmate(BoardConfig board, Figure.Color color) {
+    public static Checkmate checkmate(BoardConfig board, Figure.Color color) {
+        boolean has_moves_remaining = false;
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
                 ArrayList<Move> moves = MoveTools.get_moves(board, x, y, color);
                 if (moves == null) {
                     continue;
                 }
+                has_moves_remaining = true;
                 for (Move m : moves) {
                     BoardConfig board_new = MoveTools.exec_move(board, m);
                     if (!is_checked(board_new, color)) {
-                        return false;
+                        return Checkmate.FALSE;
                     }
                 }
             }
         }
-        return true;
+        if (!has_moves_remaining) {
+            return Checkmate.DRAW;
+        }
+        return Checkmate.TRUE;
     }
 }

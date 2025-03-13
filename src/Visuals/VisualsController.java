@@ -38,5 +38,4 @@ public abstract class VisualsController {
     public static void init(BoardDrawer drawer) {
         VisualsController.drawer = drawer;
     }
-
 }
