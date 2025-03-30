@@ -14,6 +14,10 @@ public class Const {
      */
     public static final String RSC_PATH = ".\\rsc\\";
     /**
+     * name of the settings file
+     */
+    public static final String SETTINGS_FILE = "settings.txt";
+    /**
      * Font of displayed text
      */
     public static final Font FONT = new Font(null, Font.BOLD, 20);

@@ -15,6 +15,7 @@ public class Main {
     public static void main(String[] args) {
         // initialize visuals
         Sprites.load();
+        Settings.load();
         BoardConfig board = new BoardConfig();
         board.init();
         new Frame(board);

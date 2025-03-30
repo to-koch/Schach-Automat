@@ -37,7 +37,8 @@ public abstract class Sprites {
             sprites[1][4] = ImageIO.read(new File(Const.RSC_PATH + "sprites\\black\\queen.png"));
             sprites[1][5] = ImageIO.read(new File(Const.RSC_PATH + "sprites\\black\\rook.png"));
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Unable to load sprites");
+            System.exit(1);
         }
 
     }

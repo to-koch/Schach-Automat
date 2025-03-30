@@ -1,0 +1,2 @@
+player_color=white
+rec_depth=5

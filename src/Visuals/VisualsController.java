@@ -16,7 +16,6 @@ public abstract class VisualsController {
      * reference to the board drawer
      */
     public static BoardDrawer drawer;
-
     /**
      * sends a signal to the board drawer to update
      */

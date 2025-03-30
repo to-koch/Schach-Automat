@@ -20,7 +20,7 @@ public abstract class Opponent {
     /**
      * counter to track how many turns have been played by the computer
      */
-    private static int turn_count = 3;
+    private static int turn_count = 0;
 
     /**
      * evaluates the best next move from the computer's perspective
